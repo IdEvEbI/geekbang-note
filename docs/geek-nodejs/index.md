@@ -43,7 +43,7 @@ Node.js 是一个 JavaScript 的运行环境，与 Chrome 的区别是：
 2. Visual Studio Code：<https://code.visualstudio.com/Download>
 3. Node.js：<https://nodejs.org>
 
-在控制台输入以下命令可以测试 Node.js 安装成功：
+在控制台输入以下命令可以测试 Node.js 是否安装成功：
 
 ```bash
 # 测试 Node.js 安装
@@ -55,7 +55,7 @@ npm -v
 
 ### 2.2 第一个实战 - 石头剪刀布
 
-**课程目标**：了解 Node.js 的运行方式以及在 Node.js 中如何使用全局变量。
+**课程目标**：了解 Node.js 的**运行方式**以及在 Node.js 中的**全局变量**。
 
 #### 运行方式及全局变量
 
@@ -101,9 +101,9 @@ npm -v
 
 ##### 需求说明
 
-1. 用户在命令行输入 `node index.js 石头`，表示用户出拳是**石头**
-2. 电脑随机生成石头、剪刀、布
-3. 比对结果并输出胜负结果
+1. 用户在命令行输入 `node ch2-2-rock.js 石头`，表示用户出拳是**石头**
+2. 电脑**随机**生成石头、剪刀、布
+3. 判定胜负并输出胜负结果
 
 ##### 代码实现
 
