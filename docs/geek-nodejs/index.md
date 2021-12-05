@@ -89,7 +89,7 @@ npm -v
    console.log(process)
    ```
 
-3. 提示：`process` 对象中几个重要属性如下：
+3. `process` 对象中几个重要属性如下：
 
    1. `argv`：命令行程序的命令及参数列表
    2. `env`：Node 当前运行环境的环境变量，程序员可以根据需要增加环境变量
@@ -142,3 +142,119 @@ npm -v
    ```
 
 2. 在控制台多次输入 `node ch2-2-rock.js 石头` 验证游戏效果
+
+### 2.3 模块规范
+
+以前使用 `script` 标签加载脚本存在以下问题：
+
+1. 脚本变多时，需要手动管理加载顺序
+2. 不同脚本之间逻辑调用，需要通过全局变量，例如 `jQuery` 的 `$`
+3. 没有 html 怎么办？
+
+#### 2.3.1 CommonJS 模块规范概念
+
+CommonJS 模块规范是开发一个大型 Node.js 程序的基础，CommonJS 是由 JavaScript 社区发起的，后来在 Node.js 上被应用并推广，后续也影响到了浏览器端 JavaScript 的编写。
+
+#### 2.3.2 使用 require 引用外部模块
+
+1. 新建 `ch2-3-commonjs/lib.js` 输入以下代码：
+
+   ```js
+   // 外部模块
+   console.log('hello module')
+   ```
+
+2. 新建 `ch2-3-commonjs/index.js` 输入以下代码：
+
+   ```js
+   console.log('start require')
+   const lib = require('./lib.js')
+   console.log('end require', lib)
+   ```
+
+3. 运行 `index.js` 输出效果如下：
+
+   ```bash
+   start require
+   hello module
+   end require {}
+   ```
+
+4. 使用 `webpack  --mode development --no-devtool ./index.js` 可以查看 `require` 的代码实现如下：
+
+   ```js
+   function __webpack_require__(moduleId) {
+     // Check if module is in cache
+     var cachedModule = __webpack_module_cache__[moduleId];
+     if (cachedModule !== undefined) {
+       return cachedModule.exports;
+     }
+     // Create a new module (and put it into the cache)
+     var module = __webpack_module_cache__[moduleId] = {
+       // no module.id needed
+       // no module.loaded needed
+       exports: {}
+     };
+
+     // Execute the module function
+     __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+
+     // Return the exports of the module
+     return module.exports;
+   }
+   ```
+
+   **结论**：使用 `require` 引用模块时，被引用模块中的代码会**被执行一次**。
+
+#### 2.3.3 使用 exports 导出方法或变量
+
+模块上下文提供了 `exports` 对象用于导出当前模块的方法或者变量。
+
+1. 修改 `lib.js` 代码如下：
+
+   ```js
+   // exports 是模块上下文提供的对象，用于导出变量或方法
+   console.log('lib 模块', exports)
+
+   exports.username = 'zhangsan'
+
+   exports.person = {
+     name: 'zhangsan',
+     age: 18,
+     gender: 'male'
+   }
+
+   exports.add = (a, b) => a + b
+
+   setTimeout(() => console.log(exports), 1000)
+   ```
+
+2. 修改 `index.js` 代码如下：
+
+   ```js
+   console.log('start require')
+   const lib = require('./lib.js')
+   console.log('end require', lib)
+
+   // 向 lib 模块的 exprots 对象添加对象
+   lib.testObj = { desc: 'hello module' }
+   ```
+
+3. 运行 `index.js` 输出效果如下：
+
+   ```bash
+   start require
+   hello module
+   lib 模块 {}
+   end require {
+     username: 'zhangsan',
+     person: { name: 'zhangsan', age: 18, gender: 'male' },
+     add: [Function (anonymous)]
+   }
+   {
+     username: 'zhangsan',
+     person: { name: 'zhangsan', age: 18, gender: 'male' },
+     add: [Function (anonymous)],
+     testObj: { desc: 'hello module' }
+   }
+   ```
