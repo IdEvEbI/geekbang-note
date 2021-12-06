@@ -393,7 +393,7 @@ Node.js 的官方文档 <https://nodejs.org/dist/latest-v16.x/docs/api/> 罗列�
 
 #### 2.5.1 自顶向下调用
 
-Node.js 源码下载地址：<https://github.com/nodejs/node/releases/tag/v16.13.0>，以 `os.cpus()` 函数为例。
+Node.js 源码下载地址：<https://github.com/nodejs/node/releases/tag/v16.13.0>，本小节以 `os.cpus()` 函数为例。
 
 1. 新建 `ch2-5-modules/cpu.js` 编写如下代码：
 
@@ -493,3 +493,44 @@ Node.js 源码下载地址：<https://github.com/nodejs/node/releases/tag/v16.13
 6. `os` 内置模块调用 `cpus` 函数的执行流程图如下图所示：
 
    ![nodejs-os-internal-binding](assets/nodejs-os-internal-binding.png)
+
+#### 2.5.2 观察者模式 - EventEmitter
+
+EventEmitter：<https://nodejs.org/dist/latest-v16.x/docs/api/events.html#events_class_eventemitter>
+
+1. 新建 `course.js` 并实现以下代码：
+
+   ```js
+   /**
+    * 课程模块
+    *
+    * 每隔 2 秒钟派发一个事件：NEWCOURSE（推出新课程）
+    */
+   const { EventEmitter } = require('events')
+
+   class Course extends EventEmitter {
+     constructor() {
+       super()
+
+       setInterval(() => {
+         this.emit('NEWCOURSE', { price: Math.floor(Math.random() * 100) })
+       }, 2000)
+     }
+   }
+
+   exports.course = new Course()
+   ```
+
+2. 新建 `index.js` 并实现以下代码：
+
+   ```js
+   const { course } = require('./course')
+
+   course.on('NEWCOURSE', ({ price }) => {
+     console.log('耶，出新课啦，只要：', price)
+
+     if (price <= 50) {
+       console.log('入手新课程')
+     }
+   })
+   ```
