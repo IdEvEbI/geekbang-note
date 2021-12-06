@@ -329,3 +329,44 @@ CommonJS 模块规范是开发一个大型 Node.js 程序的基础，CommonJS �
      }
    })
    ```
+
+### 2.4 npm 包管理工具
+
+npm 官网网站：<https://www.npmjs.com/>。
+
+#### 2.4.1 概念
+
+- 包：别人写的 Node.js 模块
+- npm：Node.js 的包管理工具
+
+#### 2.4.2 npm 常用命令
+
+1. 新建 `ch2-4-npm` 目录
+
+2. **把目录初始化 npm 包**，输入以下命令：
+
+   ```bash
+   npm init
+   ```
+
+   一路回车会生成一个 `package.json` 的文件，其中：
+
+   1. `package.json` 说明这个目录是一个 npm 包目录
+   2. `package.json` 是这个 npm 包的说明文件
+   3. 只要目录是一个 npm 包，就可以安装其他的 npm 包
+
+3. **安装和卸载包**
+
+   ```bash
+   # 安装指定包到依赖项 - 生产环境需要
+   npm install 包名
+
+   # 安装指定包到开发依赖 - 仅开发环境需要，生产环境不需要
+   npm install 包名 -D
+
+   # 安装 package.json 中声明的包，全新下载一套代码时使用
+   npm install
+
+   # 卸载指定的包
+   npm uninstall 包名
+   ```
