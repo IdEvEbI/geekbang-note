@@ -496,7 +496,7 @@ Node.js 源码下载地址：<https://github.com/nodejs/node/releases/tag/v16.13
 
 #### 2.5.2 观察者模式 - EventEmitter
 
-EventEmitter：<https://nodejs.org/dist/latest-v16.x/docs/api/events.html#events_class_eventemitter>
+EventEmitter：<https://nodejs.org/dist/latest-v16.x/docs/api/events.html#events_class_eventemitter>。
 
 1. 新建 `course.js` 并实现以下代码：
 
@@ -534,3 +534,56 @@ EventEmitter：<https://nodejs.org/dist/latest-v16.x/docs/api/events.html#events
      }
    })
    ```
+
+### 2.6 异步
+
+#### 2.6.1 Node.js 的非阻塞 I/O
+
+1. I/O（Input / Output），是**输入**和**输出**的意思
+2. **阻塞 I/O** 和**非阻塞 I/O** 的区别在于：**系统接收输入再到输出期间，能不能接收其他输入**
+
+示例：“这个 Node.js 问题怎么解决？在线等，急。”
+
+1. **阻塞 I/O**：不停刷新，直到等到答案为止，期间不会干别的事情
+2. **非阻塞 I/O**：去干点别的，待会儿回来看看是否有人回帖了
+
+##### 阻塞 I/O 和非阻塞 I/O 代码演练
+
+1. 新建 `ch2-6-async-io` 目录
+2. 初始化 npm 包并安装 `glob`
+
+   ```bash
+   npm init -y
+
+   npm i glob
+   ```
+
+3. 新建 `index.js` 并实现以下代码，测试**阻塞 I/O**：
+
+   ```js
+   const glob = require('glob')
+
+   // 演示 1：阻塞 I/O
+   console.time('glob')
+   // 遍历所有子目录中的 js 文件
+   const result = glob.sync(__dirname + '/**/*.js')
+   console.timeEnd('glob')
+   console.log(result)
+   ```
+
+   运行程序，可以看到在**阻塞 I/O** 模式下遍历所有文件耗时 16ms+。
+
+4. 修改代码，测试**非阻塞 I/O**：
+
+   ```js
+   // 演示 2：非阻塞 I/O
+   console.time('glob')
+   // 异步遍历所有子目录中的 js 文件
+   glob(__dirname + '/**/*.js', (err, res) => {
+     console.log(res)
+   })
+   console.timeEnd('glob')
+   console.log('随机数：', Math.floor(Math.random() * 100))
+   ```
+
+   运行程序，可以看到在**非阻塞 I/O** 模式下遍历所有文件耗时 1ms+。
