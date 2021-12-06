@@ -595,3 +595,120 @@ EventEmitter：<https://nodejs.org/dist/latest-v16.x/docs/api/events.html#events
    ```
 
    运行程序，可以看到在**非阻塞 I/O** 模式下遍历所有文件耗时 1ms+。
+
+#### 2.6.2 Node.js 异步编程 - callback
+
+> 目标：了解 Node.js callback 的规范及基本写法，知道**异步流程控制**在开发中的 2 个难点（回调地域 + 异步并发）。
+
+回调函数格式规范（**error-first callback**）：第一个参数是 error，后面的参数才是结果。
+
+##### A. 模拟面试（回调规范）
+
+- 需求场景：去参加面试，500 毫秒后通知面试结果，面试通过率 50%。
+- 代码如下：
+
+  ```js
+  /**
+   * 面试函数，500 毫秒后通知面试结果，面试通过率 50%
+   * @param {*} callback
+   */
+  const interview = (callback) => {
+    setTimeout(() => {
+      if (Math.random() >= 0.5) {
+        callback(null, 'success')
+      } else {
+        callback(new Error('fail'))
+      }
+    }, 500)
+  }
+
+  // 场景 1：只参加一轮面试
+  interview((err, res) => {
+    if (err) {
+      return console.log('面试未通过：', err.message)
+    }
+    console.log('面试通过：', res)
+  })
+  ```
+
+##### B. 回调地域
+
+所谓**回调地域**指的是：在回调中继续调用异步操作，导致**嵌套层次太深，代码不好维护**。
+
+修改上一小节业务需求，假设**需要 3 轮面试**，修改后的代码如下：
+
+```js
+// 场景 2：要参加 3 轮面试
+interview((err, res) => {
+  if (err) {
+    return console.log('第 1 轮面试失败：', err.message)
+  }
+  console.log('第 1 轮面试通过，准备 2 面')
+
+  interview((err, res) => {
+    if (err) {
+      return console.log('第 2 轮面试失败：', err.message)
+    }
+    console.log('第 2 轮面试通过，准备 3 面')
+
+    interview((err, res) => {
+      if (err) {
+        return console.log('第 3 轮面试失败：', err.message)
+      }
+
+      console.log('面试通过：', res)
+    })
+  })
+})
+```
+
+##### C. 异步并发
+
+所谓**异步并发**指的是：多个异步执行结束后，统一做后续处理，如果不使用 ES6+ 提供的异步方案，代码逻辑编写难度较高，且不好维护。
+
+> 提示：以前社区上针对**异步并发**的解决方案有 [async](https://www.npmjs.com/package/async) 。
+
+修改上一小节业务需求，假设**面试者期望拿到 2 个 Offer**，修改后的代码如下：
+
+```js
+/**
+ * 面试函数，500 ~ 700 毫秒后通知面试结果，面试通过率 50%
+ * @param {*} callback
+ */
+const interview = (callback) => {
+  setTimeout(() => {
+    if (Math.random() >= 0.5) {
+      callback(null, 'success')
+    } else {
+      callback(new Error('fail'))
+    }
+  }, 500 + Math.floor(Math.random() * 200))
+}
+
+// 场景 3：面试者期望拿到 2 个 Offer
+let count = 0
+
+interview((err, res) => {
+  if (err) {
+    return console.log('第 1 家公司面试失败：', err.message)
+  }
+  console.log('拿到第 1 家 Offer', res)
+
+  count++
+  if (count === 2) {
+    console.log('拿到 2 个 Offer，先 2 后 1')
+  }
+})
+
+interview((err, res) => {
+  if (err) {
+    return console.log('第 2 家公司面试失败：', err.message)
+  }
+  console.log('拿到第 2 家 Offer', res)
+
+  count++
+  if (count === 2) {
+    console.log('拿到 2 个 Offer，先 1 后 2')
+  }
+})
+```
