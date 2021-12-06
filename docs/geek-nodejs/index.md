@@ -334,10 +334,15 @@ CommonJS 模块规范是开发一个大型 Node.js 程序的基础，CommonJS �
 
 npm 官网网站：<https://www.npmjs.com/>。
 
-#### 2.4.1 概念
+#### 2.4.1 npm 包的概念
 
 - 包：别人写的 Node.js 模块
 - npm：Node.js 的包管理工具
+
+CommonJS 的包规范定义由两部分组成：
+
+- 包结构：用于组织包中的各种文件
+- 包描述文件，用于描述包的相关信息，以供外部读取分析
 
 #### 2.4.2 npm 常用命令
 
@@ -346,10 +351,14 @@ npm 官网网站：<https://www.npmjs.com/>。
 2. **把目录初始化 npm 包**，输入以下命令：
 
    ```bash
+   # 将当前目录初始化为 npm 包（带交互）
    npm init
+
+   # 使用默认设置将当前目录初始化为 npm 包（不带交互）
+   npm init -y
    ```
 
-   一路回车会生成一个 `package.json` 的文件，其中：
+   生成的 `package.json` 的文件被称为**包描述文件**，其中：
 
    1. `package.json` 说明这个目录是一个 npm 包目录
    2. `package.json` 是这个 npm 包的说明文件
@@ -370,3 +379,117 @@ npm 官网网站：<https://www.npmjs.com/>。
    # 卸载指定的包
    npm uninstall 包名
    ```
+
+### 2.5 Node.js 内置模块
+
+Node.js 的官方文档 <https://nodejs.org/dist/latest-v16.x/docs/api/> 罗列了 Node.js 所有的内置模块，包括：
+
+- File system：文件系统
+- Net：网络
+- Stream：I/O 流
+- Process：进程相关信息
+- OS：操作系统相关信息
+- ……
+
+#### 2.5.1 自顶向下调用
+
+Node.js 源码下载地址：<https://github.com/nodejs/node/releases/tag/v16.13.0>，以 `os.cpus()` 函数为例。
+
+1. 新建 `ch2-5-modules/cpu.js` 编写如下代码：
+
+   ```js
+   const os = require('os')
+
+   console.log(os.cpus(), os.cpus().length)
+   ```
+
+2. 运行可以查看计算机的 CPU 信息，如下所示：
+
+   ```js
+   {
+     model: 'Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz',
+     speed: 2300,
+     times: { user: 196530, nice: 0, sys: 184260, idle: 170580440, irq: 0 }
+   }
+   ```
+
+3. 查看 Node.js 源文件 `lib/os.js` 可以看到如下代码：
+
+   ```js
+   function cpus() {
+     // [] is a bugfix for a regression introduced in 51cea61
+     const data = getCPUs() || [];
+     const result = [];
+     let i = 0;
+     while (i < data.length) {
+       ArrayPrototypePush(result, {
+         model: data[i++],
+         speed: data[i++],
+         times: {
+           user: data[i++],
+           nice: data[i++],
+           sys: data[i++],
+           idle: data[i++],
+           irq: data[i++]
+         }
+       });
+     }
+     return result;
+   }
+   ```
+
+4. 在 `lib/os.js` 中查找 `getCPUs` 可以看到如下常量定义：
+
+   ```js
+   const {
+     getCPUs,
+     getFreeMem,
+     getHomeDirectory: _getHomeDirectory,
+     getHostname: _getHostname,
+     getInterfaceAddresses: _getInterfaceAddresses,
+     getLoadAvg,
+     getPriority: _getPriority,
+     getOSInformation: _getOSInformation,
+     getTotalMem,
+     getUserInfo,
+     getUptime,
+     isBigEndian,
+     setPriority: _setPriority
+   } = internalBinding('os');
+   ```
+
+   - 其中可以把 `internalBinding('os')` 看做是一个 API 调用的桥梁
+   - 通过 `internalBinding('os')` 可以调用 `src/node_os.cc` 中的代码
+
+5. 在 `src/node_os.cc` 中查找 `getCPUs` 可以看到如下代码：
+
+   ```cpp
+   void Initialize() {
+     Environment* env = Environment::GetCurrent(context);
+
+     env->SetMethod(target, "getCPUs", GetCPUInfo);
+   }
+   ```
+
+   继续查找 `GetCPUInfo` 可以看到如下代码：
+
+   ```cpp
+   static void GetCPUInfo(const FunctionCallbackInfo<Value>& args) {
+     Environment* env = Environment::GetCurrent(args);
+     Isolate* isolate = env->isolate();
+
+     uv_cpu_info_t* cpu_infos;
+     int count;
+
+     int err = uv_cpu_info(&cpu_infos, &count);
+
+     // 以下代码省略 ……
+
+     uv_free_cpu_info(cpu_infos, count);
+     args.GetReturnValue().Set(Array::New(isolate, result.data(), result.size()));
+   }
+   ```
+
+6. `os` 内置模块调用 `cpus` 函数的执行流程图如下图所示：
+
+   ![nodejs-os-internal-binding](assets/nodejs-os-internal-binding.png)
