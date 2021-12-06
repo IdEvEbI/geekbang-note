@@ -55,7 +55,7 @@ npm -v
 
 ### 2.2 第一个实战 - 石头剪刀布
 
-**课程目标**：了解 Node.js 的**运行方式**以及在 Node.js 中的**全局变量**。
+> 目标：了解 Node.js 的**运行方式**以及在 Node.js 中的**全局变量**。
 
 #### 2.2.1 运行方式及全局变量
 
@@ -144,6 +144,8 @@ npm -v
 2. 在控制台多次输入 `node ch2-2-rock.js 石头` 验证游戏效果
 
 ### 2.3 模块规范
+
+> 目标：了解 CommonJS 模块规范及基本使用。
 
 以前使用 `script` 标签加载脚本存在以下问题：
 
@@ -332,6 +334,8 @@ CommonJS 模块规范是开发一个大型 Node.js 程序的基础，CommonJS �
 
 ### 2.4 npm 包管理工具
 
+> 目标：了解 npm 包的概念及 npm 常用命令。
+
 npm 官网网站：<https://www.npmjs.com/>。
 
 #### 2.4.1 npm 包的概念
@@ -381,6 +385,8 @@ CommonJS 的包规范定义由两部分组成：
    ```
 
 ### 2.5 Node.js 内置模块
+
+> 目标：了解内置模块的**自顶向下**调用机制，知道如何使用 `EventEmitter` 实现观察者模式。
 
 Node.js 的官方文档 <https://nodejs.org/dist/latest-v16.x/docs/api/> 罗列了 Node.js 所有的内置模块，包括：
 
@@ -538,6 +544,8 @@ EventEmitter：<https://nodejs.org/dist/latest-v16.x/docs/api/events.html#events
 ### 2.6 异步
 
 #### 2.6.1 Node.js 的非阻塞 I/O
+
+> 目标：了解 Node.js 是通过异步实现的非阻塞 I/O，以及非阻塞 I/O 的好处。
 
 1. I/O（Input / Output），是**输入**和**输出**的意思
 2. **阻塞 I/O** 和**非阻塞 I/O** 的区别在于：**系统接收输入再到输出期间，能不能接收其他输入**
