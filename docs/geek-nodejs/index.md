@@ -712,3 +712,49 @@ interview((err, res) => {
   }
 })
 ```
+
+#### 2.6.3 Node.js 异步编程 - 事件循环
+
+> 目标：了解 Node.js 事件循环的实现机制。
+
+简单事件循环的模拟需求：
+
+1. 每隔 1 秒检测一下 `queue` 是否有回调函数
+2. 如果有，从队列中取出**第一个回调**并执行
+3. 用户可以利用**非阻塞 I/O** 输入任意模拟事件的名称，例如：键盘输入、鼠标输入
+4. 如果用户输入的是 `exit` 程序结束
+
+注意：每一次回调函数的执行，都是在新的调用栈上执行的，要注意 this 的绑定。
+
+```js
+const eventloop = {
+  // 事件队列
+  queue: [],
+  // 循环方法
+  loop() {
+    console.log('请输入模拟事件，exit 退出')
+
+    // 处理事件队列
+    while (this.queue.length) {
+      this.queue.shift()()
+    }
+
+    setTimeout(this.loop.bind(this), 2000)
+  },
+  // 向事件队列添加回调
+  add(callback) {
+    this.queue.pop(callback)
+  }
+}
+
+eventloop.loop()
+
+process.stdin.on('data', e => {
+  const event = e.toString().trim()
+
+  if (event === 'exit') {
+    process.exit()
+  }
+  eventloop.add(console.log(`检测到 ${event} 事件……`))
+})
+```
