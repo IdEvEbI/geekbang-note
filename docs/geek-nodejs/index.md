@@ -758,3 +758,124 @@ process.stdin.on('data', e => {
   eventloop.add(console.log(`检测到 ${event} 事件……`))
 })
 ```
+
+#### 2.6.4 Node.js 异步编程 - Promise
+
+> 目标：了解 Promise 的基本概念及能够解决什么问题。
+
+##### A. Promise 概念
+
+- 字面含义：承诺，期约，表示当前事件循环得不到的结果，但会在未来的事件循环给到结果
+- Promise 是一个状态机，包含三个状态：pending、fulfilled/resolved、rejected，如下图所示：
+
+  ![promise-state-machine](assets/promise-state-machine.png)
+
+##### B. Promise 实例化和状态流转
+
+使用 `new Promise` 可以创建一个 Promise 对象，代码如下：
+
+```js
+let promise = new Promise(function (resolve, reject) {})
+```
+
+其中：
+
+- `resolve` 可以把 Promise 的状态从 `pending` 流转到 `fulfilled`
+- `reject` 可以把 Promise 的状态从 `pending` 流转到 `rejected`
+- 注意：`resolve` 和 `reject` 状态之间不能相互转换
+
+##### C. Promise 的回调方法
+
+Promise 是一个状态机，当 Promise 的状态发生流转时，会根据状态调用不同的回调方法 `then` 和 `catch`，其中：
+
+- resolved 状态的 Promise 会回调后面的第一个 `.then`
+- rejected 状态的 Promise 会回调后面的第一个 `.catch`
+- 任何一个 rejected 状态且后面没有 .catch 的 Promise，都会造成浏览器 / Node 环境的全局错误
+
+示例代码如下：
+
+```js
+const promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    // resolve('padding to fulfilled')
+    reject(new Error('error: padding to error'))
+  }, 300)
+}).then(res => console.log(res))
+  .catch(err => console.log(err.message))
+```
+
+执行 then 和 catch 会**返回一个新的 Promise**，该 Promise 最终状态根据 then 和 catch 的回调函数执行结果决定：
+
+- 如果该回调函数最终是 `throw`，则该 Promise 是 rejected 状态
+- 如果该回调函数最终是 `return`，则该 Promise 是 resolved 状态
+- 但如果回调函数最终 return 了一个 Promise，该 Promise 会和回调函数 return 的 Promise 状态保持一致
+
+##### D. Promise 实现模拟面试
+
+1. 改造后的面试函数
+
+   ```js
+   /**
+    * 面试函数，500 ~ 700 毫秒后通知面试结果，面试通过率 50%
+    *
+    * @param {String} companyName 面试公司名
+    * @param {Number} round 面试轮数
+    * @returns Promise
+    */
+   const interview = (companyName, round) => {
+     return new Promise((resolve, reject) => {
+       setTimeout(() => {
+         if (Math.random() >= 0.5) {
+           resolve(`面试 ${companyName} 第 ${round} 轮通过`)
+         } else {
+           reject(new Error(`面试 ${companyName} 第 ${round} 轮失败...`))
+         }
+       }, 500 + Math.floor(Math.random() * 200))
+     })
+   }
+   ```
+
+2. 场景一：只参加一轮面试
+
+   ```js
+   interview('ali', 1)
+     .then(res => console.log(res))
+     .catch(err => console.log(err.message))
+   ```
+
+3. 场景二：要参加 3 轮面试
+
+   ```js
+   interview('ali', 1)
+     .then(res => {
+       console.log(res)
+       return interview('ali', 2)
+     })
+     .then(res => {
+       console.log(res)
+       return interview('ali', 3)
+     })
+     .then(res => console.log(res))
+     .catch(err => console.log(err.message))
+   ```
+
+4. 场景 3：面试者期望拿到 2 个 Offer
+
+   ```js
+   Promise
+     .all([
+       interview('ali', 1)
+         .then(res => {
+           console.log(res)
+           return interview('ali', 2)
+         })
+         .then(res => {
+           console.log(res)
+           return interview('ali', 3)
+         }),
+       interview('360', 1)
+     ]).then(res => console.log(res))
+     .catch(err => console.log(err.message))
+   ```
+
+   > 使用 `Promise.all` 基本上能够满足日常大部分的**异步并发**开发需求。
