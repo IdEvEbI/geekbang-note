@@ -2,6 +2,8 @@
 
 ## 1. 基础概念
 
+> 目标：了解 HTTP 服务基本概念，建立**请求**和**响应**的基本认知。
+
 - 概念：HTTP 协议全称 Hyper Text Transfer Protocol（超文本传输协议），是整个 Web 应用的基础。
 - 作用：负责在**浏览器**与**服务器**之间传送文档；
   1. 把**网络资源**打包成一个**网络数据包**，以便于在网络上传输；
@@ -11,6 +13,8 @@
   2. HTTP 服务器向浏览器返回 HTTP 包，返回对请求处理结果的 HTTP **响应**（`response`）报文。
 
 ## 2. 简单实现一个 HTTP 服务器
+
+> 目标：掌握用 http 内置模块实现一个简单 HTTP 的基本步骤，并知道使用 fs 模块的 `pipe` 返回一个网页。
 
 ### 2.1 简单实现一个 HTTP 服务器
 
@@ -90,6 +94,8 @@ http
 > 扩展模块 [httpserver](https://www.npmjs.com/package/httpserver)。
 
 ## 3. 实现网页版石头剪刀布
+
+> 目标：强化 http 内置模块实现网页交互的方法，发现随着业务逻辑的增加，代码的可维护性下降。
 
 ### 3.1 准备石头剪刀布游戏的网页
 
@@ -317,4 +323,127 @@ http
      res.end('你玩赖，我不跟你完了。')
      return
    }
+   ```
+
+## 4. Express
+
+> 目标：了解 Express 框架的基本使用以及不完善的洋葱圈模型。
+
+### 4.1 Express 介绍
+
+Express 的 npm 网站为：<https://www.npmjs.com/package/express>。
+
+- Express 特性如下：
+
+  1. 强大的路由功能；
+  2. 专注于高性能；
+  3. 高测试覆盖率；
+  4. HTTP 辅助（重定向、缓存等）；
+  5. 14+ 模板引擎支持；
+  6. 内容协商；
+  7. 强大的脚手架快速生成应用。
+
+- 核心功能：
+
+  1. 路由
+  2. request & response 简化
+
+### 4.2 Express 路由体验
+
+> 目标：对石头剪刀布游戏进行初步的改造，体验通过**路由**把代码逻辑封装到三个独立的代码块，易于程序维护。
+
+1. 安装框架：
+
+   ```bash
+   npm init -y 
+
+   npm i express 
+   ```
+
+2. 基础的 express 框架代码：
+
+   ```js
+   const express = require('express')
+
+   const app = express()
+
+   app.get('/favicon.ico', (req, res) => {
+     res.writeHead(200)
+     res.end()
+   })
+
+   app.get('/', (req, res) => {
+     res.writeHead(200)
+     res.end('Hello Express')
+   })
+
+   app.listen(3000, () => console.log('play game at http://localhost:3000'))   
+   ```
+
+3. 加载 `game.html`：
+
+   ```js
+   const fs = require('fs')
+
+   // ...
+
+   app.get('/', (req, res) => {
+     res.writeHead(200)
+     fs.createReadStream(__dirname + '/game.html').pipe(res)
+   })
+   ```
+
+4. 复制游戏逻辑：
+
+   ```js
+   const { game } = require('./game')
+
+   const playerInfo = {
+     wonCount: 0,        // 胜利次数
+     isCheating: false,  // 是否作弊
+     lastAction: null,   // 上次出拳
+     sameAction: 0,      // 相同出拳
+   }
+
+   // ...
+
+   app.get('/game', (req, res) => {
+     const url = new URL(req.url, `http://${req.headers.host}/`)
+     const action = url.searchParams.get('action')
+
+     // 判断玩家是否连赢三局或者作弊
+     if (playerInfo.wonCount >= 3 || playerInfo.isCheating) {
+       res.writeHead(500)
+       const msg = playerInfo.isCheating ? '你玩赖' : '你太厉害了'
+       res.end(`${msg}，我不跟你完了。`)
+       return
+     }
+
+     // 判断玩家是否连续出一样的拳
+     playerInfo.lastAction === action
+       ?
+       playerInfo.sameAction++
+       :
+       playerInfo.sameAction = 0
+     playerInfo.lastAction = action
+
+     if (playerInfo.sameAction >= 3) {
+       playerInfo.isCheating = true
+       res.writeHead(400)
+       res.end('你玩赖，我不跟你完了。')
+       return
+     }
+
+     const result = game(action)
+     res.writeHead(200)
+     if (result === 0) {
+       res.end('我们旗鼓相当啊。')
+     } else if (result === 1) {
+       playerInfo.wonCount++
+       res.end(`你连赢了 ${playerInfo.wonCount} 局，真厉害~~~`)
+     } else {
+       playerInfo.wonCount = 0
+       res.end('你输了，加油哦。')
+     }
+   })
    ```
