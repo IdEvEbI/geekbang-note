@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页版石头剪刀布</title>
+  <style>
+    .game-output {
+      width: 600px;
+      height: 400px;
+      background-color: #eee;
+      overflow: auto;
+    }
+
+    .game-panel {
+      display: flex;
+      width: 600px;
+      border: 1px solid #ccc;
+    }
+
+    .game-panel button {
+      flex: 1;
+      width: 80px;
+      height: 40px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="game-output"></div>
+  <div class="game-panel">
+    <button class="rock">石头</button>
+    <button class="scissor">剪刀</button>
+    <button class="paper">布</button>
+  </div>
+
+  <script>
+    const buttons = {
+      rock: document.querySelector('.game-panel .rock'),
+      scissor: document.querySelector('.game-panel .scissor'),
+      paper: document.querySelector('.game-panel .paper')
+    }
+
+    const panel = document.querySelector('.game-output')
+
+    for (const key in buttons) {
+      buttons[key].onclick = function () {
+        fetch(`http://${location.host}/game?action=${key}`)
+          .then(res => res.text())
+          .then(text => {
+            panel.innerHTML += text + '<br>'
+            panel.scrollTop = panel.scrollHeight
+          })
+      }
+    }
+  </script>
+</body>
+
+</html>
