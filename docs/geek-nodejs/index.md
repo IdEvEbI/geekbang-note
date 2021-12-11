@@ -879,3 +879,109 @@ const promise = new Promise((resolve, reject) => {
    ```
 
    > 使用 `Promise.all` 基本上能够满足日常大部分的**异步并发**开发需求。
+
+#### 2.6.5 Node.js 异步编程 - async/await
+
+> 目标：知道 async & await 的特点，并能够使用 async 实现异步编程。
+
+##### A. async 是 Promise 的语法糖
+
+`async function` 本质上是 Promise 的语法糖封装，就是一个返回 Promise 的普通函数，验证代码如下：
+
+```js
+// 1. 对比 resolove 的 async & Promise
+console.log(async function () {
+  return 'hello async'
+}())
+
+console.log(function () {
+  return Promise.resolve('hello async')
+}())
+
+// 2. 对比 rejected 的 async & Promise
+console.log(async function () {
+  throw new Error('rejected async')
+}())
+
+console.log(function () {
+  return Promise.reject(new Error('rejected async'))
+}())
+```
+
+##### B. async/await 以同步的方式做异步开发
+
+1. `await` 可以“暂停” `async function` 的执行
+2. `await` 可以以同步的方式获取 Promise 的执行结果
+3. `try-catch` 可以获取 `await` 所得到的的错误
+
+示例代码如下：
+
+```js
+const result = (async () => {
+  let content = null
+  try {
+    content = await new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // 1. 测试 content 获取 resolve 的结果
+        // resolve('hello await')
+        // 2. 测试 try-catch 捕获 reject 的错误
+        reject(new Error('rejected'))
+      }, 500)
+    })
+  } catch (e) {
+    console.log(e.message)
+  }
+  console.log(content)
+
+  return 'async & aswit'
+})()
+
+setTimeout(() => {
+  console.log('====>', result)
+}, 800)
+```
+
+##### C. async/await 实现模拟面试
+
+1. 场景一：只参加一轮面试
+
+   ```js
+   (async () => {
+     try {
+       const res = await interview('ali', 1)
+       console.log(res)
+     } catch (err) {
+       console.log(err.message)
+     }
+   })();
+   ```
+
+2. 场景二：要参加 3 轮面试
+
+   ```js
+   (async () => {
+     try {
+       console.log(await interview('ali', 1))
+       console.log(await interview('ali', 2))
+       console.log(await interview('ali', 3))
+     } catch (err) {
+       console.log(err.message)
+     }
+   })();
+   ```
+
+3. 场景 3：面试者期望拿到 2 个 Offer
+
+   ```js
+   (async () => {
+     try {
+       const result = await Promise.all([
+         interview('ali', 1),
+         interview('360', 1)
+       ])
+       console.log(result)
+     } catch (err) {
+       console.log(err.message)
+     }
+   })()
+   ```

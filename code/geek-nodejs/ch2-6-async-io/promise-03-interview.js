@@ -24,17 +24,17 @@ const interview = (companyName, round) => {
 //   .catch(err => console.log(err.message))
 
 // 场景 2：要参加 3 轮面试
-interview('ali', 1)
-  .then(res => {
-    console.log(res)
-    return interview('ali', 2)
-  })
-  .then(res => {
-    console.log(res)
-    return interview('ali', 3)
-  })
-  .then(res => console.log(res))
-  .catch(err => console.log(err.message))
+// interview('ali', 1)
+//   .then(res => {
+//     console.log(res)
+//     return interview('ali', 2)
+//   })
+//   .then(res => {
+//     console.log(res)
+//     return interview('ali', 3)
+//   })
+//   .then(res => console.log(res))
+//   .catch(err => console.log(err.message))
 
 // 场景 3：面试者期望拿到 2 个 Offer
 Promise
