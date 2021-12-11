@@ -508,3 +508,58 @@ Express 的 npm 网站为：<https://www.npmjs.com/package/express>。
      }
    })
    ```
+
+### 4.4 Express 中间件
+
+> 目标：了解 express 的中间件的作用及编写方法。
+
+通过**中间件**可以把一段很长的逻辑，分开到不同的部分，通过 `next` 将逻辑串联起来。
+
+修改 `/game` 路由：
+
+```js
+app.get('/game',
+  (req, res, next) => {
+    // 判断玩家是否连赢三局或者作弊
+    if (playerInfo.wonCount >= 3 || playerInfo.isCheating) {
+      const msg = playerInfo.isCheating ? '你玩赖' : '你太厉害了'
+      res.status(500).send(`${msg}，我不跟你完了。`)
+    } else {
+      next()
+    }
+  },
+  (req, res, next) => {
+    const { action } = req.query
+
+    // 判断玩家是否连续出一样的拳
+    playerInfo.lastAction === action
+      ?
+      playerInfo.sameAction++
+      :
+      playerInfo.sameAction = 0
+    playerInfo.lastAction = action
+
+    if (playerInfo.sameAction >= 3) {
+      playerInfo.isCheating = true
+      res.status(400).send('你玩赖，我不跟你完了。')
+    } else {
+      next()
+    }
+  },
+  (req, res, next) => {
+    const { action } = req.query
+
+    const result = game(action)
+    res.status(200)
+    if (result === 0) {
+      res.send('我们旗鼓相当啊。')
+    } else if (result === 1) {
+      playerInfo.wonCount++
+      res.send(`你连赢了 ${playerInfo.wonCount} 局，真厉害~~~`)
+    } else {
+      playerInfo.wonCount = 0
+      res.send('你输了，加油哦。')
+    }
+  }
+)
+```
