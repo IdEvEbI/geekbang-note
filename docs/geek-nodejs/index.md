@@ -10,3 +10,4 @@
 1. [基础概念及快速体验](./preparation.md)
 2. [模块规范及内置模块](./modules.md)
 3. [Node.js 异步编程](./async.md)
+4. [HTTP 服务](./http.md)
