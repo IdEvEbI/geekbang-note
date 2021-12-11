@@ -761,12 +761,12 @@ process.stdin.on('data', e => {
 
 #### 2.6.4 Node.js 异步编程 - Promise
 
-> 目标：了解 Promise 的基本概念及能够解决什么问题。
+> 目标：了解 Promise 的状态流转并能够使用 Promise 实现常规的异步编程。
 
 ##### A. Promise 概念
 
-- 字面含义：承诺，期约，表示当前事件循环得不到的结果，但会在未来的事件循环给到结果
-- Promise 是一个状态机，包含三个状态：pending、fulfilled/resolved、rejected，如下图所示：
+- 字面含义：承诺，期约，表示**当前事件循环得不到的结果，会在未来的事件循环得到**
+- Promise 是一个**状态机**，包含三个状态：`pending`、`fulfilled`/`resolved`、`rejected`，如下图所示：
 
   ![promise-state-machine](assets/promise-state-machine.png)
 
@@ -782,15 +782,15 @@ let promise = new Promise(function (resolve, reject) {})
 
 - `resolve` 可以把 Promise 的状态从 `pending` 流转到 `fulfilled`
 - `reject` 可以把 Promise 的状态从 `pending` 流转到 `rejected`
-- 注意：`resolve` 和 `reject` 状态之间不能相互转换
+- 注意：`resolve` 和 `reject` 状态之间**不能相互转换**
 
 ##### C. Promise 的回调方法
 
-Promise 是一个状态机，当 Promise 的状态发生流转时，会根据状态调用不同的回调方法 `then` 和 `catch`，其中：
+Promise 是一个**状态机**，当 Promise 的状态发生流转时，会根据状态调用不同的回调方法 `then` 和 `catch`，其中：
 
-- resolved 状态的 Promise 会回调后面的第一个 `.then`
-- rejected 状态的 Promise 会回调后面的第一个 `.catch`
-- 任何一个 rejected 状态且后面没有 .catch 的 Promise，都会造成浏览器 / Node 环境的全局错误
+- `resolved` 状态的 Promise 会回调后面的第一个 `.then`
+- `rejected` 状态的 Promise 会回调后面的第一个 `.catch`
+- 任何一个 `rejected` 状态且后面没有 `.catch` 的 Promise，都会造成浏览器 / Node 环境的全局错误
 
 示例代码如下：
 
@@ -804,7 +804,7 @@ const promise = new Promise((resolve, reject) => {
   .catch(err => console.log(err.message))
 ```
 
-执行 then 和 catch 会**返回一个新的 Promise**，该 Promise 最终状态根据 then 和 catch 的回调函数执行结果决定：
+执行 `.then` 和 `.catch` 会**返回一个新的 Promise**，该 Promise 最终状态根据 `.then` 和 `.catch` 的**回调函数的执行结果**决定：
 
 - 如果该回调函数最终是 `throw`，则该 Promise 是 rejected 状态
 - 如果该回调函数最终是 `return`，则该 Promise 是 resolved 状态
