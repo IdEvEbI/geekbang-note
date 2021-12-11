@@ -44,9 +44,8 @@ app.get('/game',
     }
   },
   (req, res, next) => {
-    const { action } = req.query
+    const result = game(req.query.action)
 
-    const result = game(action)
     res.status(200)
     if (result === 0) {
       res.send('我们旗鼓相当啊。')

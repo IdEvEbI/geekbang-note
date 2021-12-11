@@ -563,3 +563,83 @@ app.get('/game',
   }
 )
 ```
+
+#### 4.4.1 Express 中间件的洋葱圈模型
+
+1. 修改 `/game` 路由中的**游戏判定胜负**的逻辑：
+
+   ```js
+   (req, res, next) => {
+     const result = game(req.query.action)
+     if (result === 0) {
+       res.gameMessage = '我们旗鼓相当啊。'
+     } else if (result === 1) {
+       playerInfo.wonCount++
+       res.gameMessage = `你连赢了 ${playerInfo.wonCount} 局，真厉害~~~`
+     } else {
+       playerInfo.wonCount = 0
+       res.gameMessage = '你输了，加油哦。'
+     }
+   }
+   ```
+
+2. 修改 `/game` 路由中的**判断连胜**的逻辑：
+
+   ```js
+   (req, res, next) => {
+     // 判断玩家是否连赢三局或者作弊
+     if (playerInfo.wonCount >= 3 || playerInfo.isCheating) {
+       const msg = playerInfo.isCheating ? '你玩赖' : '你太厉害了'
+       res.status(500).send(`${msg}，我不跟你完了。`)
+     } else {
+       next()
+       // 注意：next() 后续的中间件执行完毕后会执行当前代码
+       res.status(200).send(res.gameMessage)
+     }
+   },
+   ```
+
+   > 提示：next() 调用完后续中间件之后，会执行下方的代码，这就是所谓的**洋葱圈**模型。
+
+#### 4.4.2 Express 中间件洋葱圈模型的缺陷
+
+1. 修改 `/game` 路由中的**游戏判定胜负**的逻辑：
+
+   ```js
+   (req, res, next) => {
+     const result = game(req.query.action)
+
+     setTimeout(() => {
+       if (result === 0) {
+         res.gameMessage = '我们旗鼓相当啊。'
+       } else if (result === 1) {
+         playerInfo.wonCount++
+         res.gameMessage = `你连赢了 ${playerInfo.wonCount} 局，真厉害~~~`
+       } else {
+         playerInfo.wonCount = 0
+         res.gameMessage = '你输了，加油哦。'
+       }
+     }, 500)
+   }
+   ```
+
+2. 修改 `/game` 路由中的**判断连胜**的逻辑：
+
+   ```js
+   (req, res, next) => {
+     // 判断玩家是否连赢三局或者作弊
+     if (playerInfo.wonCount >= 3 || playerInfo.isCheating) {
+       const msg = playerInfo.isCheating ? '你玩赖' : '你太厉害了'
+       res.status(500).send(`${msg}，我不跟你完了。`)
+     } else {
+       res.gameMessage = '我们开始游戏吧'
+
+       next()
+
+       // 注意：next() 后续的中间件执行完毕后会执行当前代码
+       res.status(200).send(res.gameMessage)
+     }
+   },
+   ```
+
+   > 提示：如果在判断胜负位置增加了延时的异步，`next()` 调用完后续中间件之后，`res.gameMessage` 的内容并不能及时更新回来，这是 express 中间件的一个缺陷，在开发中需要注意。
