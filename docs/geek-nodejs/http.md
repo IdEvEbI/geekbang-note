@@ -447,3 +447,64 @@ Express 的 npm 网站为：<https://www.npmjs.com/package/express>。
      }
    })
    ```
+
+### 4.3 Express HTTP 辅助
+
+> 目标：了解利用 HTTP 辅助能够对 http 模块的一些简化操作。
+
+1. 修改 `/favicon.ico` 路由：
+
+   ```js
+   app.get('/favicon.ico', (req, res) => {
+     res.status(200).end()
+   })
+   ```
+
+2. 修改 `/` 路由：
+
+   ```js
+   app.get('/', (req, res) => {
+     res.status(200).send(fs.readFileSync(__dirname + '/game.html', 'utf8'))
+   })
+   ```
+
+3. 修改 `/game` 路由：
+
+   ```js
+   app.get('/game', (req, res) => {
+     const { action } = req.query
+
+     // 判断玩家是否连赢三局或者作弊
+     if (playerInfo.wonCount >= 3 || playerInfo.isCheating) {
+       const msg = playerInfo.isCheating ? '你玩赖' : '你太厉害了'
+       res.status(500).send(`${msg}，我不跟你完了。`)
+       return
+     }
+
+     // 判断玩家是否连续出一样的拳
+     playerInfo.lastAction === action
+       ?
+       playerInfo.sameAction++
+       :
+       playerInfo.sameAction = 0
+     playerInfo.lastAction = action
+
+     if (playerInfo.sameAction >= 3) {
+       playerInfo.isCheating = true
+       res.status(400).send('你玩赖，我不跟你完了。')
+       return
+     }
+
+     const result = game(action)
+     res.status(200)
+     if (result === 0) {
+       res.send('我们旗鼓相当啊。')
+     } else if (result === 1) {
+       playerInfo.wonCount++
+       res.send(`你连赢了 ${playerInfo.wonCount} 局，真厉害~~~`)
+     } else {
+       playerInfo.wonCount = 0
+       res.send('你输了，加油哦。')
+     }
+   })
+   ```
