@@ -327,7 +327,7 @@ http
 
 ## 4. Express
 
-> 目标：了解 Express 框架的基本使用以及不完善的洋葱圈模型。
+> 目标：了解 Express 框架的基本使用以及不够完善的洋葱圈模型。
 
 ### 4.1 Express 介绍
 
@@ -345,8 +345,13 @@ Express 的 npm 网站为：<https://www.npmjs.com/package/express>。
 
 - 核心功能：
 
-  1. 路由
-  2. request & response 简化
+  1. 路由；
+  2. `request`/`response` 简化
+     1. request：pathname、query 等；
+     2. response：send()、json()、jsonp() 等；
+  3. 中间件
+     1. 更好地组织流程代码；
+     2. 异步会打破 Express 的洋葱模型。
 
 ### 4.2 Express 路由体验
 
@@ -513,7 +518,7 @@ Express 的 npm 网站为：<https://www.npmjs.com/package/express>。
 
 > 目标：了解 express 的中间件的作用及编写方法。
 
-通过**中间件**可以把一段很长的逻辑，分开到不同的部分，通过 `next` 将逻辑串联起来。
+通过**中间件**可以把一段很长的逻辑，分开到不同的部分，通过 `next` 将逻辑串联起来，更好地组织流程代码。
 
 修改 `/game` 路由：
 
@@ -603,6 +608,8 @@ app.get('/game',
 
 #### 4.4.2 Express 中间件洋葱圈模型的缺陷
 
+> 结论：异步会打破 Express 的洋葱模型。
+
 1. 修改 `/game` 路由中的**游戏判定胜负**的逻辑：
 
    ```js
@@ -643,3 +650,141 @@ app.get('/game',
    ```
 
    > 提示：如果在判断胜负位置增加了延时的异步，`next()` 调用完后续中间件之后，`res.gameMessage` 的内容并不能及时更新回来，这是 express 中间件的一个缺陷，在开发中需要注意。
+
+## 5. Koa
+
+### 5.1 Koa 介绍
+
+Koa 的 npm 网站为：<https://www.npmjs.com/package/koa>。
+
+- Koa 核心功能：
+
+  1. 使用 `async function` 实现的中间件
+     1. 有“暂停执行”的能力；
+     2. 在异步的情况下也符合洋葱模型；
+  2. 由 `ctx` 包装 `request`/`response`，操作更简单
+     1. `ctx.status = 200`；
+     2. `ctx.body = 'helloworld'`；
+  3. 精简内核，所有额外功能都移到中间件里实现，Koa 没有绑定任何的中间件，默认不提供**路由**支持。
+
+- Koa vs Express
+  1. Express 门槛更低，Koa 更强大优雅；
+  2. Express 封装更多东西，开发更快速，Koa 可定制型更高。
+
+### 5.2 Koa 快速体验
+
+> 目标：对石头剪刀布游戏进行改造 TODO
+
+1. 安装框架：
+
+   ```bash
+   npm i koa @koa/router
+   ```
+
+2. 基础的 koa 框架代码：
+
+   ```js
+   const Koa = require('koa')
+   const app = new Koa()
+
+   app.use(async ctx => {
+     ctx.body = 'Hello Koa'
+   })
+
+   app.listen(3000, () => console.log('play game at http://localhost:3000'))
+   ```
+
+3. 处理路由：
+
+   ```js
+   const Koa = require('koa')
+   const Router = require('@koa/router')
+
+   const app = new Koa()
+   const router = new Router()
+
+   app.use(router.routes())
+
+   router.get('/favicon.ico', ctx => {
+     ctx.status = 200
+   })
+   ```
+
+4. 加载 `game.html`：
+
+   ```js
+   const fs = require('fs')
+
+   // ...
+
+   router.get('/', ctx => {
+     ctx.status = 200
+     ctx.type = 'text/html'
+     ctx.body = fs.readFileSync(__dirname + '/game.html')
+   })
+   ```
+
+5. 实现游戏基础逻辑：
+
+   ```js
+   const { game } = require('./game')
+
+   const playerInfo = {
+     wonCount: 0,        // 胜利次数
+     lastAction: null,   // 上次出拳
+     sameAction: 0,      // 相同出拳
+   }
+
+   // ...
+
+   router.get('/game',
+     async (ctx, next) => {
+       // 判断玩家是否连续出一样的拳
+       playerInfo.lastAction === ctx.query.action
+         ?
+         playerInfo.sameAction++
+         :
+         playerInfo.sameAction = 0
+       playerInfo.lastAction = ctx.query.action
+
+       if (playerInfo.sameAction >= 3) {
+         ctx.status = 400
+         ctx.body = '你玩赖，我不跟你玩了。'
+         return
+       }
+
+       await next()
+     },
+     async (ctx, next) => {
+       // 判断玩家是否连赢三局
+       if (playerInfo.wonCount >= 3) {
+         ctx.status = 500
+         ctx.body = '你太厉害了，我不跟你玩了。'
+         return
+       }
+
+       await next()
+
+       const result = ctx.gameResult
+       ctx.status = 200
+       if (result === 0) {
+         ctx.body = '我们旗鼓相当啊。'
+       } else if (result === 1) {
+         playerInfo.wonCount++
+         ctx.body = `你连赢了 ${playerInfo.wonCount} 局，真厉害~~~`
+       } else {
+         playerInfo.wonCount = 0
+         ctx.body = '你输了，加油哦。'
+       }
+     },
+
+     async (ctx, next) => {
+       ctx.gameResult = await new Promise(reslove => {
+         setTimeout(() => {
+           reslove(game(ctx.query.action))
+         }, 50)
+       })
+     })
+   ```
+
+   > 提示：通过 `async function` Koa 的洋葱圈模型并不会被异步打断，代码的逻辑性会更好。

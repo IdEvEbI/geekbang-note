@@ -20,7 +20,7 @@ app.get('/game',
     // 判断玩家是否连赢三局或者作弊
     if (playerInfo.wonCount >= 3 || playerInfo.isCheating) {
       const msg = playerInfo.isCheating ? '你玩赖' : '你太厉害了'
-      res.status(500).send(`${msg}，我不跟你完了。`)
+      res.status(500).send(`${msg}，我不跟你玩了。`)
     } else {
       next()
     }
@@ -38,7 +38,7 @@ app.get('/game',
 
     if (playerInfo.sameAction >= 3) {
       playerInfo.isCheating = true
-      res.status(400).send('你玩赖，我不跟你完了。')
+      res.status(400).send('你玩赖，我不跟你玩了。')
     } else {
       next()
     }
