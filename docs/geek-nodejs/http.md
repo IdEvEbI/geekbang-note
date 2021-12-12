@@ -665,7 +665,7 @@ Koa 的 npm 网站为：<https://www.npmjs.com/package/koa>。
   2. 由 `ctx` 包装 `request`/`response`，操作更简单
      1. `ctx.status = 200`；
      2. `ctx.body = 'helloworld'`；
-  3. 精简内核，所有额外功能都移到中间件里实现，Koa 没有绑定任何的中间件，默认不提供**路由**支持。
+  3. 精简内核，所有额外功能都移到中间件里实现，Koa 没有绑定任何的中间件，不提供**路由**支持。
 
 - Koa vs Express
   1. Express 门槛更低，Koa 更强大优雅；
@@ -673,7 +673,7 @@ Koa 的 npm 网站为：<https://www.npmjs.com/package/koa>。
 
 ### 5.2 Koa 快速体验
 
-> 目标：对石头剪刀布游戏进行改造 TODO
+> 目标：对石头剪刀布游戏进行改造，对比 Koa 和 Express 的使用差异。
 
 1. 安装框架：
 
