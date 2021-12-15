@@ -4,7 +4,7 @@
 
 ## 1. 基础环境准备
 
-1. 安装软件 VS Code 和 Node.js；
+1. 安装软件 [VS Code](https://code.visualstudio.com/) 和 [Node.js](https://nodejs.org/)；
 2. 新建 `ts-in-action` 目录；
 3. 初始化工程：
 
@@ -55,8 +55,8 @@
    yarn add -D html-webpack-plugin ts-loader
    ```
 
-   - `html-webpack-plugin` 可以通过一个模板生成网站首页，并且把输出文件自动嵌入到首页中
-   - `ts-loader` 可以把 ts 文件编译成 js 文件
+   - `html-webpack-plugin`：用模板生成网站首页，并把输出的文件自动嵌入到首页中；
+   - `ts-loader`：webpack 使用的 TypeScript loader。
 
 2. 新建模板文件 `./str/tpl/index.html`：
 
