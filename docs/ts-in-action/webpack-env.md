@@ -1,37 +1,8 @@
-# 基础篇
+# 构建开发环境
 
-JavaScript 是一门动态弱类型语言，对变量的类型非常宽容，而且不会在这些变量和它们的调用者之间建立**结构化的契约**。
+> 目标：使用 webpack 构建课程开发环境和生产环境。
 
-TypeScript 是拥有类型系统的 JavaScript 的超级，**可以编译成纯 JavaScript**。
-
-使用 TypeScript 的好处如下：
-
-- 类型检查
-- 语言扩展
-- 用接口定义代替文档
-- IDE 能够提高开发效率，降低维护成本
-- 重塑“类型思维”
-
-> TypeScript 官网在线测试平台（Playground）：<https://www.typescriptlang.org/play>。
-
-## 1. 类型基础
-
-- **强类型语言**：不允许改变变量的数据类型，除非进行强制类型转换，不同类型的变量不能相互赋值；
-- **弱类型语言**：变量可以被赋予不同的数据类型，虽然更灵活，但更容易产生 BUG；
-- **静态语言**：在编译阶段确定所有变量的类型，特点如下：
-  - 对类型严格 / 立即发现错误 / 运行时性能好 / 自文档化；
-- **动态语言**：在执行阶段确定所有变量的类型，特点如下：
-  - 对类型宽松 / Bug 可能隐藏很久 / 运行时性能差 / 可读性差。
-
-动态语言的支持者认为：
-
-- 性能是可以改善的（V8 引擎），语言的灵活性更重要
-- 隐藏的错误可以通过单元测试发现
-- 文档可以通过工具生成
-
-## 2. 开发环境准备 - Hello TypeScript
-
-### 2.1 基础环境准备
+## 1. 基础环境准备
 
 1. 安装软件 VS Code 和 Node.js；
 2. 新建 `ts-in-action` 目录；
@@ -68,7 +39,7 @@ TypeScript 是拥有类型系统的 JavaScript 的超级，**可以编译成纯 
    var hello = 'Hello TypeScript';
    ```
 
-### 2.2 webpack 构建工具
+## 2. webpack 构建工具
 
 1. 安装 `webpack`、`webpack-cli`、`webpack-dev-server`
 
@@ -76,7 +47,7 @@ TypeScript 是拥有类型系统的 JavaScript 的超级，**可以编译成纯 
    yarn add -D webpack webpack-cli webpack-dev-server
    ```
 
-#### 2.2.1 公共环境配置
+### 2.1 公共环境配置
 
 1. 安装 `html-webpack-plugin` 和 `ts-loader`：
 
@@ -139,7 +110,7 @@ TypeScript 是拥有类型系统的 JavaScript 的超级，**可以编译成纯 
    }
    ```
 
-#### 2.2.2 开发环境和生产环境配置
+### 2.2 开发环境和生产环境配置
 
 1. 新建 `./build/webpack.dev.config.js` **开发环境配置**：
 
@@ -173,7 +144,7 @@ TypeScript 是拥有类型系统的 JavaScript 的超级，**可以编译成纯 
    }
    ```
 
-#### 2.2.3 配置入口
+### 2.3 配置入口
 
 1. 安装 `webpack-merge`：
 
@@ -197,7 +168,7 @@ TypeScript 是拥有类型系统的 JavaScript 的超级，**可以编译成纯 
    module.exports = merge(baseConfig, config)
    ```
 
-#### 2.2.4 修改 package.json
+### 2.4 修改 package.json
 
 1. 修改包入口：
 
