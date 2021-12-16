@@ -55,3 +55,21 @@ let un1: undefined = undefined
 let un2 = undefined // undefined 是任何类型的子集，自动推断的结果是 any
 let nu1: null = null
 let nu2 = null // undefined 是任何类型的子集，自动推断的结果是 any
+
+// 8. void
+let noReturn = () => { }
+
+// 9. any
+let x
+x = 1
+x = []
+x = () => { }
+
+// 10. never
+let error = () => {
+  throw new Error('error')
+}
+
+let endless = () => {
+  while (true) { }
+}
