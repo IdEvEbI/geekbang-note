@@ -126,7 +126,7 @@ let obj2 = { x: 1, y: 2 }
 ```ts
 const s1: symbol = Symbol()
 const s2 = Symbol() // 因为具有唯一的值，推断类型是 s2
-console.log(s1 === s2)
+console.log(s1 === s2) // false
 ```
 
 #### 2.2.7 `undefined` && `null`
@@ -155,7 +155,7 @@ let nu2 = null // undefined 是任何类型的子集，自动推断的结果是 
 ```js
 (function () {
    let undefined = 100
-   console.log(undefined)
+   console.log(undefined) // 100
 })()
 ```
 
@@ -177,7 +177,7 @@ x = []
 x = () => { }
 ```
 
-> 提示：在 TypeScript 中如果所有的类型都使用 `any` 那基本等同于用 JavaScript 开发了，所以，在开发中建议尽量不要使用 `any` 类型。
+> 提示：在 TypeScript 中如果所有的类型都使用 `any` 那基本等同于用 JavaScript 开发了。所以，在开发中建议尽量避免使用 `any` 类型。
 
 #### 2.2.10 `never`
 
