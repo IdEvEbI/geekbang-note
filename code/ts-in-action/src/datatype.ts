@@ -1,7 +1,11 @@
 // 1. 原始类型
-let bool: boolean = true
-let num: number = 123
-let str: string = 'hello'
+// let bool: boolean = true
+// let num: number = 123
+// let str: string = 'hello'
+// 如果使用字面量给变量赋值，TypeScript 能够自动推断出变量类型。
+let bool = true
+let num = 123
+let str = 'hello'
 
 // 2. 数组
 let arr1: number[] = [1, 2, 3]
@@ -10,6 +14,10 @@ let arr2: Array<number> = [1, 2, 3]
 // 使用联合类型定义数组，允许数组保存多种数据类型的数据
 let arr3: (number | string)[] = [1, 2, 'hello', 3]
 console.log(arr3)
+
+// 如果使用字面量给数组赋值，TypeScript 能够自动推断出变量类型。
+let arr4 = [1, 2, 3]
+let arr5 = [1, 2, 'hello']
 
 // 3. 元组
 let tuple: [number, string] = [1, 'xiaoming']
@@ -30,3 +38,9 @@ console.log(add)
 let computer: (x: number, y: number) => number
 // 2> 定义函数实现
 computer = (a, b) => a + b
+
+// 5. 对象
+let obj1: { x: number, y: number } = { x: 1, y: 2 }
+
+// 如果使用字面量给对象赋值，TypeScript 能够自动推断出变量类型。
+let obj2 = { x: 1, y: 2 }

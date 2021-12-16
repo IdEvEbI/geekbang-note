@@ -40,6 +40,14 @@ TypeScript 支持与 JavaScript 几乎相同的数据类型，此外还提供了
    let str: string = 'hello'
    ```
 
+   > 提示：如果使用字面量给变量赋值，TypeScript 能够**自动推断**出变量类型。
+
+   ```ts
+   let bool = true
+   let num = 123
+   let str = 'hello'
+   ```
+
 2. **数组**：一旦指定保存数据的数据类型，就不允许向数组中添加其他类型的数据。
 
    ```ts
@@ -51,6 +59,13 @@ TypeScript 支持与 JavaScript 几乎相同的数据类型，此外还提供了
 
    ```ts
    let arr3: (number | string)[] = [1, 2, 'hello', 3]
+   ```
+
+   > 提示：如果使用字面量给数组赋值，TypeScript 能够**自动推断**出变量类型。
+
+   ```ts
+   let arr4 = [1, 2, 3]
+   let arr5 = [1, 2, 'hello']
    ```
 
 3. **元组**：是一种特殊类型的数组，限定了元组数据的类型和个数。
@@ -79,4 +94,17 @@ TypeScript 支持与 JavaScript 几乎相同的数据类型，此外还提供了
    let computer: (x: number, y: number) => number
    // 2> 定义函数实现
    computer = (a, b) => a + b
+   ```
+
+5. **对象**：一旦指定了对象的键以及对应的数据类型，就不允许增加其他的键。
+
+   ```ts
+   let obj1: { x: number, y: number } = { x: 1, y: 2 }
+   obj1.z = 3 // Error
+   ```
+
+   > 提示：如果使用字面量给对象赋值，TypeScript 能够**自动推断**出变量类型。
+
+   ```ts
+   let obj2 = { x: 1, y: 2 }
    ```
