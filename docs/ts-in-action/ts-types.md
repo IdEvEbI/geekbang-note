@@ -108,3 +108,25 @@ TypeScript 支持与 JavaScript 几乎相同的数据类型，此外还提供了
    ```ts
    let obj2 = { x: 1, y: 2 }
    ```
+
+6. **Symbol**：具有唯一的值，在初始化时可以自动推断类型，不过类型不再是 `symbol`：
+
+   ```ts
+   const s1: symbol = Symbol()
+   const s2 = Symbol() // 因为具有唯一的值，推断类型是 s2
+   console.log(s1 === s2)
+   ```
+
+7. undefined && null：可以给变量声明成 `undefined` 或 `null` 类型，但是一旦声明，就不能再给该变量赋予其他类型的值。
+
+   ```ts
+   let un1: undefined = undefined
+   let nu1: null = null
+   ```
+
+   > 提示：在 TypeScript 中 `undefined` 和 `null` 是任何类型的子集，因此在定义变量时，如果赋值为 `undefined` 或 `null`，自动推断的结果是 `any`。
+
+   ```ts
+   let un2 = undefined // undefined 是任何类型的子集，自动推断的结果是 any
+   let nu2 = null // undefined 是任何类型的子集，自动推断的结果是 any
+   ```

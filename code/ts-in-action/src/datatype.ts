@@ -44,3 +44,14 @@ let obj1: { x: number, y: number } = { x: 1, y: 2 }
 
 // 如果使用字面量给对象赋值，TypeScript 能够自动推断出变量类型。
 let obj2 = { x: 1, y: 2 }
+
+// 6. Symbol
+const s1: symbol = Symbol()
+const s2 = Symbol()
+console.log(s1 === s2)
+
+// 7. undifined & null
+let un1: undefined = undefined
+let un2 = undefined // undefined 是任何类型的子集，自动推断的结果是 any
+let nu1: null = null
+let nu2 = null // undefined 是任何类型的子集，自动推断的结果是 any
