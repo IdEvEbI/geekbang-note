@@ -45,3 +45,4 @@ TypeScript 是拥有类型系统的 JavaScript 的超级，**可以编译成纯 
 
 1. [构建开发环境](./webpack-env.md)
 2. [TypeScript 基本类型](./ts-types.md)
+3. [接口](./interface.md)

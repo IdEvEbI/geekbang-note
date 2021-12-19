@@ -1,4 +1,4 @@
-import './enums'
+import './interface'
 
 const hello: string = 'Hello TypeScript'
 
