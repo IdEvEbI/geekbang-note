@@ -149,7 +149,7 @@ let nu2 = null // undefined 是任何类型的子集，自动推断的结果是 
 
 **`void`** 表示没有任何返回值的类型，常用于没有任何返回值的函数。
 
-1. 在 JavaScript 中 `void` 是一个操作符，可以让任何一个表达式返回 `undefined`，例如 `void 0`；
+1. 在 JavaScript 中 `void` 是一个操作符，可以让任何一个表达式返回 `undefined`，例如 `void(0)`；
 2. 注意：在 JavaScript 中 `undefined` 不是一个保留字，我们可以自定义一个 `undefined` 变量覆盖全局的 `undefined`：
 
 ```js
@@ -204,3 +204,80 @@ let endless = () => {
 4. **元组**需要使用类型注解，因为元组需要**指定每个位置数据的类型**；
 5. **`Symbol`** 不需要使用类型注解；
 6. **`undefined`**、**`null`**、**`never`** 用在类型注解的场景较少。
+
+## 3. 枚举类型
+
+### 3.1 不使用枚举在开发中的常见问题
+
+以下是一段根据数值判断用户角色的示例代码：
+
+```js
+function initByRole(role) {
+  if (role === 1 || role === 2) {
+    // do sth
+  } else if (role === 3 || role == 4) {
+    // do sth
+  } else if (role === 5) {
+    // do sth
+  } else {
+    // do sth
+  }
+}
+```
+
+这段代码存在以下问题：
+
+- **可读性差**：很难记住数字的含义；
+- **可维护差**：硬编码，牵一发动全身。
+
+### 3.2 枚举的概念
+
+**枚举**：一组有名字的**常量集合**，使用枚举类型可以为一组数值赋予更友好的名字，增强代码的可读性，避免在开发时使用魔法数字。
+
+枚举类型包括**数字枚举**和**字符串枚举**两种类型。
+
+#### 3.2.1 数字枚举
+
+```ts
+/** 角色枚举类型 */
+enum Role {
+  Reporter,
+  Developer,
+  Maintainer,
+  Owner,
+  Guest
+}
+
+console.log('报告者角色', Role.Reporter) // 0
+```
+
+- 默认情况下，枚举类型从 0 开始为元素编号；
+- 在开发时，可以手动指定枚举类型中任意成员的数值，同时还可以通过枚举的**数值**索引得到对应的名称字符串，代码如下：
+
+```ts
+/** 角色枚举类型 */
+enum Role {
+  Reporter = 1,
+  Developer = 2,
+  Maintainer = 4,
+  Owner = 8,
+  Guest = 0
+}
+
+console.log(Role[2], typeof Role[2]) // Developer string
+```
+
+以上代码编译成 JavaScript 之后的代码如下：
+
+```js
+var Role;
+(function (Role) {
+    Role[Role["Reporter"] = 1] = "Reporter";
+    Role[Role["Developer"] = 2] = "Developer";
+    Role[Role["Maintainer"] = 4] = "Maintainer";
+    Role[Role["Owner"] = 8] = "Owner";
+    Role[Role["Guest"] = 0] = "Guest";
+})(Role || (Role = {}));
+```
+
+> 提示：在枚举对象中，枚举**成员名称**被作为 `Key`，**值**被作为 `Value`，同时 `Value` 又被作为 `Key`，**成员名称**被作为 `Value`，这种方式叫做**反向映射**。

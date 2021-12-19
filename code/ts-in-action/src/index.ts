@@ -1,6 +1,6 @@
-import './datatype'
+import './enums'
 
 const hello: string = 'Hello TypeScript'
 
-const el = document.querySelector('.app') as HTMLDivElement
+const el = document.getElementById('app') as HTMLDivElement
 el.innerText = hello
