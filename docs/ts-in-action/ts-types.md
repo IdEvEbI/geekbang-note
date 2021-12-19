@@ -281,3 +281,73 @@ var Role;
 ```
 
 > 提示：在枚举对象中，枚举**成员名称**被作为 `Key`，**值**被作为 `Value`，同时 `Value` 又被作为 `Key`，**成员名称**被作为 `Value`，这种方式叫做**反向映射**。
+
+#### 3.2.2 字符串枚举
+
+```ts
+/** 请求消息 */
+enum Message {
+  Success = '恭喜，请求成功',
+  Fail = '抱歉，请求失败'
+}
+```
+
+字符串枚举被编译成 JavaScript 之后的代码如下：
+
+```js
+var Message;
+(function (Message) {
+    Message["Success"] = "\u606D\u559C\uFF0C\u8BF7\u6C42\u6210\u529F";
+    Message["Fail"] = "\u62B1\u6B49\uFF0C\u8BF7\u6C42\u5931\u8D25";
+})(Message || (Message = {}));
+```
+
+> 提示：在字符串枚举对象中，只有成员的名称被作为了 `Key`，因此字符串枚举不支持**反向映射**。
+
+#### 3.2.3 常量枚举
+
+用 `const` 声明的枚举就是一个**常量枚举**，常量枚举**在编译阶段会被移除** —— 只有值会被保留，而枚举的名称不会被保留。
+
+```ts
+const enum WeekDay {
+  Sunday,
+  Monday,
+  Tuesday,
+  Wednesday,
+  Thursday,
+  Friday,
+  Saturday
+}
+console.log(WeekDay.Monday) // 1
+// console.log(WeekDay) // Error
+```
+
+> 提示：当我们不需要对象，而**只需要对象值的时候**，可以使用常量枚举，这样可以减少在编译环境的代码。
+
+如下代码：
+
+```ts
+const weekDay = [
+  WeekDay.Sunday,
+  WeekDay.Monday,
+  WeekDay.Thursday,
+  WeekDay.Wednesday,
+  WeekDay.Thursday,
+  WeekDay.Friday,
+  WeekDay.Saturday
+]
+```
+
+在编译后会被翻译成：
+
+```js
+const weekDay = [
+    0 /* Sunday */,
+    1 /* Monday */,
+    4 /* Thursday */,
+    3 /* Wednesday */,
+    4 /* Thursday */,
+    5 /* Friday */,
+    6 /* Saturday */
+];
+```
